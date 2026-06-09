@@ -1,3 +1,6 @@
+from contextlib import asynccontextmanager
+from collections.abc import AsyncIterator
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -5,11 +8,21 @@ from app.api.v1.router import api_router
 from app.core.config import settings
 
 
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    if settings.init_db_on_startup:
+        from app.db_init import main as initialize_database
+
+        initialize_database()
+    yield
+
+
 def create_app() -> FastAPI:
     app = FastAPI(
         title=settings.app_name,
         version="0.1.0",
         description="Digital twin MVP for medical student learning simulation.",
+        lifespan=lifespan,
     )
 
     app.add_middleware(
@@ -30,4 +43,3 @@ def create_app() -> FastAPI:
 
 
 app = create_app()
-

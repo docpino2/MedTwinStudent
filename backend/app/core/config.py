@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     openai_api_key: str | None = None
     openai_base_url: str = "https://api.openai.com/v1"
     openai_model: str = "gpt-4.1-mini"
+    init_db_on_startup: bool = False
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
@@ -20,4 +21,3 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
-
