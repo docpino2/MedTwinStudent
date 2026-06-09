@@ -1,0 +1,328 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://medtwin.student/schemas/competency_model.schema.json",
+  "title": "MedTwin Student Competency Model",
+  "description": "Schema for medical education competencies, subcompetencies, mastery evidence, and remediation strategies.",
+  "type": "object",
+  "required": [
+    "id",
+    "cycle",
+    "domain",
+    "title",
+    "core_competency_family",
+    "complexity_level",
+    "subcompetencies"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9_:-]+$"
+    },
+    "cycle": {
+      "type": "string",
+      "enum": ["basic_sciences", "clinical_sciences", "internship"]
+    },
+    "domain": {
+      "type": "string",
+      "examples": ["chest_pain", "dyspnea", "abdominal_pain"]
+    },
+    "title": {
+      "type": "string",
+      "minLength": 3
+    },
+    "description": {
+      "type": "string"
+    },
+    "core_competency_family": {
+      "type": "string",
+      "enum": [
+        "biomedical_mechanisms",
+        "data_gathering",
+        "problem_representation",
+        "differential_diagnosis",
+        "diagnostic_testing",
+        "initial_management",
+        "patient_safety",
+        "communication",
+        "metacognition",
+        "adaptive_expertise"
+      ]
+    },
+    "complexity_level": {
+      "description": "Case or learning-object complexity from 1 to 5.",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 5
+    },
+    "prerequisite_competencies": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "target_concepts": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "subcompetencies": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/subcompetency"
+      }
+    },
+    "aggregate_mastery": {
+      "$ref": "#/$defs/masteryEstimate"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "$defs": {
+    "subcompetency": {
+      "type": "object",
+      "required": [
+        "id",
+        "title",
+        "observable_behaviors",
+        "score",
+        "mastery_level",
+        "evidence_sources",
+        "recommended_remediation"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9_:-]+$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 3
+        },
+        "description": {
+          "type": "string"
+        },
+        "observable_behaviors": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "assessment_methods": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/assessmentMethod"
+          },
+          "default": []
+        },
+        "common_failure_modes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/failureMode"
+          },
+          "default": []
+        },
+        "score": {
+          "description": "Rubric score from 0 to 4.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4
+        },
+        "mastery_level": {
+          "type": "string",
+          "enum": ["not_observed", "novice", "developing", "competent", "adaptive"]
+        },
+        "mastery_estimate": {
+          "$ref": "#/$defs/masteryEstimate"
+        },
+        "evidence_sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidenceSource"
+          },
+          "default": []
+        },
+        "recommended_remediation": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/remediationStrategy"
+          },
+          "default": []
+        }
+      }
+    },
+    "assessmentMethod": {
+      "type": "string",
+      "enum": [
+        "quiz_item",
+        "concept_map",
+        "mechanistic_explanation",
+        "case_response",
+        "script_concordance_test",
+        "key_feature_question",
+        "osce_station",
+        "think_aloud",
+        "simulation",
+        "mini_cex",
+        "epa_observation",
+        "chart_audit",
+        "reflection_note",
+        "ai_tutor_dialogue"
+      ]
+    },
+    "failureMode": {
+      "type": "object",
+      "required": ["type", "description", "severity"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "misconception",
+            "fragmented_recall",
+            "poor_transfer",
+            "premature_closure",
+            "anchoring",
+            "availability_bias",
+            "confirmation_bias",
+            "poor_prioritization",
+            "unsafe_management",
+            "delayed_escalation",
+            "communication_gap",
+            "overconfidence",
+            "cognitive_overload"
+          ]
+        },
+        "description": {
+          "type": "string"
+        },
+        "severity": {
+          "type": "string",
+          "enum": ["low", "moderate", "high", "critical"]
+        }
+      }
+    },
+    "evidenceSource": {
+      "type": "object",
+      "required": ["type", "source_id", "summary"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "$ref": "#/$defs/assessmentMethod"
+        },
+        "source_id": {
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "observed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 4
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+    "remediationStrategy": {
+      "type": "object",
+      "required": ["strategy_type", "title", "rationale", "target_concepts"],
+      "additionalProperties": false,
+      "properties": {
+        "strategy_type": {
+          "type": "string",
+          "enum": [
+            "mechanism_micro_lesson",
+            "retrieval_practice",
+            "concept_map_repair",
+            "illness_script_comparison",
+            "socratic_tutoring",
+            "cognitive_forcing_checklist",
+            "case_contrast_set",
+            "simulation_retry",
+            "handoff_rehearsal",
+            "near_miss_debrief",
+            "supervisor_review"
+          ]
+        },
+        "title": {
+          "type": "string"
+        },
+        "rationale": {
+          "type": "string"
+        },
+        "target_concepts": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "estimated_duration_minutes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "success_criteria": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        }
+      }
+    },
+    "masteryEstimate": {
+      "type": "object",
+      "required": ["score", "level", "probability", "confidence"],
+      "additionalProperties": false,
+      "properties": {
+        "score": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4
+        },
+        "level": {
+          "type": "string",
+          "enum": ["not_observed", "novice", "developing", "competent", "adaptive"]
+        },
+        "probability": {
+          "description": "Estimated probability that the learner can perform this competency in a comparable context.",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "confidence": {
+          "description": "Confidence in the estimate based on quantity and quality of evidence.",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "last_updated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}
+

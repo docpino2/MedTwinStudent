@@ -1,0 +1,80 @@
+[
+  {
+    "id": "cardiac_ischemia_pathophysiology",
+    "label": "Myocardial ischemia pathophysiology",
+    "domain": "chest_pain",
+    "cycle": "basic_sciences",
+    "prerequisites": [],
+    "learning_objectives": [
+      "Explain oxygen supply-demand mismatch in myocardial tissue.",
+      "Connect coronary plaque rupture to acute coronary syndromes."
+    ]
+  },
+  {
+    "id": "chest_pain_red_flags",
+    "label": "Chest pain red flags",
+    "domain": "chest_pain",
+    "cycle": "clinical_sciences",
+    "prerequisites": ["cardiac_ischemia_pathophysiology"],
+    "learning_objectives": [
+      "Identify chest pain features requiring urgent evaluation.",
+      "Prioritize unstable diagnoses before common benign diagnoses."
+    ]
+  },
+  {
+    "id": "ecg_initial_interpretation",
+    "label": "Initial ECG interpretation",
+    "domain": "chest_pain",
+    "cycle": "clinical_sciences",
+    "prerequisites": ["cardiac_ischemia_pathophysiology"],
+    "learning_objectives": [
+      "Recognize ischemic ECG patterns.",
+      "Differentiate STEMI, NSTEMI, and non-ischemic findings at an MVP level."
+    ]
+  },
+  {
+    "id": "acs_risk_stratification",
+    "label": "Acute coronary syndrome risk stratification",
+    "domain": "chest_pain",
+    "cycle": "internship",
+    "prerequisites": ["chest_pain_red_flags", "ecg_initial_interpretation"],
+    "learning_objectives": [
+      "Use risk factors, symptoms, ECG, and biomarkers to stratify ACS likelihood.",
+      "State disposition logic for low, intermediate, and high-risk chest pain."
+    ]
+  },
+  {
+    "id": "troponin_kinetics",
+    "label": "Troponin kinetics",
+    "domain": "chest_pain",
+    "cycle": "internship",
+    "prerequisites": ["cardiac_ischemia_pathophysiology"],
+    "learning_objectives": [
+      "Explain why serial troponins are needed.",
+      "Interpret early negative troponin results in context."
+    ]
+  },
+  {
+    "id": "initial_acs_management",
+    "label": "Initial ACS management",
+    "domain": "chest_pain",
+    "cycle": "internship",
+    "prerequisites": ["acs_risk_stratification", "troponin_kinetics"],
+    "learning_objectives": [
+      "Propose immediate stabilization and antiplatelet-oriented first steps.",
+      "Escalate care for persistent ischemic symptoms or unstable vitals."
+    ]
+  },
+  {
+    "id": "differential_diagnosis_chest_pain",
+    "label": "Differential diagnosis of chest pain",
+    "domain": "chest_pain",
+    "cycle": "clinical_sciences",
+    "prerequisites": ["chest_pain_red_flags"],
+    "learning_objectives": [
+      "Compare cardiac, pulmonary, vascular, gastrointestinal, and musculoskeletal causes.",
+      "Avoid closing on a single benign diagnosis before ruling out dangerous causes."
+    ]
+  }
+]
+

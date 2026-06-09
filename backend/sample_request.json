@@ -1,0 +1,50 @@
+{
+  "student": {
+    "id": "stu_clinical_001",
+    "name": "Miguel Torres",
+    "cycle": "clinical_sciences",
+    "current_rotation": "Internal medicine clerkship",
+    "mastery_level": "developing",
+    "strengths": ["history taking", "broad differential diagnosis"],
+    "vulnerabilities": ["ECG pattern recognition", "biomarker timing"],
+    "knowledge_state": [
+      {
+        "concept_id": "chest_pain_red_flags",
+        "concept_label": "Chest pain red flags",
+        "mastery": 0.74,
+        "confidence": 0.68,
+        "last_assessed_at": "2026-06-03"
+      },
+      {
+        "concept_id": "ecg_initial_interpretation",
+        "concept_label": "Initial ECG interpretation",
+        "mastery": 0.45,
+        "confidence": 0.42,
+        "last_assessed_at": "2026-06-03"
+      }
+    ],
+    "learning_preferences": ["case comparison", "Socratic prompts"]
+  },
+  "clinical_case": {
+    "id": "case_chest_pain_001",
+    "domain": "chest_pain",
+    "title": "Exertional Chest Pain in the Emergency Department",
+    "setting": "Emergency department",
+    "stem": "A 58-year-old man presents with 40 minutes of substernal chest pressure that began while climbing stairs. The pain radiates to his left arm and is associated with nausea and diaphoresis. He has hypertension and smokes.",
+    "patient_age": 58,
+    "patient_sex": "male",
+    "vitals": {
+      "blood_pressure": "156/94 mmHg",
+      "heart_rate": "104 bpm",
+      "respiratory_rate": "20/min",
+      "oxygen_saturation": "96% room air",
+      "temperature": "36.8 C"
+    },
+    "findings": ["Substernal pressure", "Radiation to left arm", "Diaphoresis", "Nausea", "Cardiovascular risk factors"],
+    "required_concepts": ["chest_pain_red_flags", "ecg_initial_interpretation", "acs_risk_stratification", "troponin_kinetics"],
+    "red_flags": ["exertional chest pressure", "radiation to left arm", "diaphoresis", "cardiovascular risk factors"],
+    "expected_reasoning_steps": ["Recognize high-risk features for ACS.", "Request immediate ECG and serial troponins."]
+  },
+  "student_response": "I would request an ECG and consider acute coronary syndrome because of exertional chest pressure, diaphoresis, and cardiovascular risk factors."
+}
+

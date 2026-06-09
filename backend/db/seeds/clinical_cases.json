@@ -1,0 +1,46 @@
+[
+  {
+    "id": "case_chest_pain_001",
+    "domain": "chest_pain",
+    "title": "Exertional Chest Pain in the Emergency Department",
+    "setting": "Emergency department",
+    "stem": "A 58-year-old man presents with 40 minutes of substernal chest pressure that began while climbing stairs. The pain radiates to his left arm and is associated with nausea and diaphoresis. He has hypertension and smokes.",
+    "patient_age": 58,
+    "patient_sex": "male",
+    "vitals": {
+      "blood_pressure": "156/94 mmHg",
+      "heart_rate": "104 bpm",
+      "respiratory_rate": "20/min",
+      "oxygen_saturation": "96% room air",
+      "temperature": "36.8 C"
+    },
+    "findings": [
+      "Substernal pressure",
+      "Radiation to left arm",
+      "Diaphoresis",
+      "Nausea",
+      "Cardiovascular risk factors"
+    ],
+    "required_concepts": [
+      "chest_pain_red_flags",
+      "ecg_initial_interpretation",
+      "acs_risk_stratification",
+      "troponin_kinetics",
+      "initial_acs_management",
+      "differential_diagnosis_chest_pain"
+    ],
+    "red_flags": [
+      "exertional chest pressure",
+      "radiation to left arm",
+      "diaphoresis",
+      "cardiovascular risk factors"
+    ],
+    "expected_reasoning_steps": [
+      "Recognize high-risk features for ACS.",
+      "Request immediate ECG and serial troponins.",
+      "Keep life-threatening chest pain causes in the differential.",
+      "Recommend initial ACS management and monitored disposition."
+    ]
+  }
+]
+
