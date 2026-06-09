@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     environment: str = "development"
     database_url: str = "postgresql+psycopg://medtwin:medtwin@localhost:5432/medtwin"
     backend_cors_origins: str = "http://localhost:3000"
+    backend_cors_origin_regex: str | None = r"https://.*\.lovable\.app"
     openai_api_key: str | None = None
     openai_base_url: str = "https://api.openai.com/v1"
     openai_model: str = "gpt-4.1-mini"
