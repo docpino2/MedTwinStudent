@@ -46,7 +46,8 @@
         "patient_safety",
         "communication",
         "metacognition",
-        "adaptive_expertise"
+        "adaptive_expertise",
+        "ai_digital_health"
       ]
     },
     "complexity_level": {
@@ -176,6 +177,10 @@
         "chart_audit",
         "reflection_note",
         "ai_tutor_dialogue"
+        ,
+        "ai_prompt_review",
+        "ai_output_critique",
+        "agent_workflow_review"
       ]
     },
     "failureMode": {
@@ -199,6 +204,11 @@
             "communication_gap",
             "overconfidence",
             "cognitive_overload"
+            ,
+            "ai_overreliance",
+            "privacy_violation",
+            "uncritical_ai_acceptance",
+            "unsafe_ai_workflow"
           ]
         },
         "description": {
@@ -263,6 +273,11 @@
             "handoff_rehearsal",
             "near_miss_debrief",
             "supervisor_review"
+            ,
+            "safe_ai_prompting_practice",
+            "ai_output_verification",
+            "agent_workflow_simulation",
+            "privacy_governance_checklist"
           ]
         },
         "title": {
@@ -325,4 +340,3 @@
     }
   }
 }
-
