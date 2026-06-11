@@ -1,0 +1,221 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://medtwin.student/schemas/professor_twin.schema.json",
+  "title": "MedTwin Professor Digital Twin",
+  "description": "Schema for modeling a professor digital twin focused on adaptive teaching, clinical education, and AI/Digital Health pedagogy.",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "role",
+    "teaching_cycles",
+    "clinical_domains",
+    "core_teaching_competencies",
+    "ai_digital_teaching_competencies",
+    "teaching_evidence",
+    "development_plan"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9_:-]+$"
+    },
+    "name": {
+      "type": "string"
+    },
+    "role": {
+      "type": "string",
+      "examples": ["clinical_teacher", "course_director", "simulation_faculty", "internship_supervisor"]
+    },
+    "department": {
+      "type": "string"
+    },
+    "teaching_cycles": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["basic_sciences", "clinical_sciences", "internship"]
+      }
+    },
+    "clinical_domains": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "teaching_style_profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "socratic_tendency": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "feedback_specificity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "assessment_alignment": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "technology_readiness": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+    "core_teaching_competencies": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/competencyEstimate"
+      }
+    },
+    "ai_digital_teaching_competencies": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/competencyEstimate"
+      }
+    },
+    "teaching_evidence": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/teachingEvidence"
+      }
+    },
+    "detected_pedagogical_risks": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/pedagogicalRisk"
+      },
+      "default": []
+    },
+    "development_plan": {
+      "$ref": "#/$defs/developmentPlan"
+    }
+  },
+  "$defs": {
+    "competencyEstimate": {
+      "type": "object",
+      "required": ["id", "label", "score", "level", "evidence_summary"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "score": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4
+        },
+        "level": {
+          "type": "string",
+          "enum": ["not_observed", "novice", "developing", "competent", "adaptive"]
+        },
+        "evidence_summary": {
+          "type": "string"
+        },
+        "recommended_growth_activity": {
+          "type": "string"
+        }
+      }
+    },
+    "teachingEvidence": {
+      "type": "object",
+      "required": ["type", "source_id", "summary"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "lesson_plan",
+            "clinical_case_design",
+            "rubric",
+            "feedback_sample",
+            "student_outcomes",
+            "peer_observation",
+            "self_reflection",
+            "ai_activity_design",
+            "agent_workflow_design"
+          ]
+        },
+        "source_id": {
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "observed_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "pedagogicalRisk": {
+      "type": "object",
+      "required": ["risk", "level", "rationale", "mitigation"],
+      "additionalProperties": false,
+      "properties": {
+        "risk": {
+          "type": "string",
+          "enum": [
+            "misaligned_assessment",
+            "generic_feedback",
+            "unsafe_ai_activity",
+            "privacy_gap",
+            "overreliance_on_ai_outputs",
+            "insufficient_human_supervision",
+            "weak_longitudinal_follow_up"
+          ]
+        },
+        "level": {
+          "type": "string",
+          "enum": ["low", "moderate", "high", "critical"]
+        },
+        "rationale": {
+          "type": "string"
+        },
+        "mitigation": {
+          "type": "string"
+        }
+      }
+    },
+    "developmentPlan": {
+      "type": "object",
+      "required": [
+        "priority_goal",
+        "recommended_activities",
+        "follow_up_metric",
+        "review_interval_days"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "priority_goal": {
+          "type": "string"
+        },
+        "recommended_activities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "follow_up_metric": {
+          "type": "string"
+        },
+        "review_interval_days": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    }
+  }
+}
+
