@@ -1,9 +1,10 @@
 from fastapi import APIRouter
 
-from app.api.v1 import ai_health, cases, curriculum, reasoning, simulation, students, tutor
+from app.api.v1 import ai_health, cases, curriculum, reasoning, sessions, simulation, students, tutor
 
 api_router = APIRouter()
 api_router.include_router(students.router, prefix="/students", tags=["students"])
+api_router.include_router(sessions.router, prefix="/sessions", tags=["sesiones longitudinales"])
 api_router.include_router(curriculum.router, prefix="/curriculum", tags=["curriculum"])
 api_router.include_router(cases.router, prefix="/cases", tags=["clinical cases"])
 api_router.include_router(reasoning.router, prefix="/reasoning", tags=["reasoning"])

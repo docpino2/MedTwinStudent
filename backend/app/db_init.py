@@ -15,6 +15,22 @@ def create_tables() -> None:
     Base.metadata.create_all(bind=engine)
 
 
+def ensure_existing_table_columns() -> None:
+    if engine.dialect.name != "postgresql":
+        return
+
+    statements = [
+        "ALTER TABLE assessment_attempts ADD COLUMN IF NOT EXISTS session_id TEXT REFERENCES learning_sessions(id)",
+        "ALTER TABLE assessment_attempts ADD COLUMN IF NOT EXISTS confidence_before DOUBLE PRECISION",
+        "ALTER TABLE assessment_attempts ADD COLUMN IF NOT EXISTS confidence_after DOUBLE PRECISION",
+        "ALTER TABLE assessment_attempts ADD COLUMN IF NOT EXISTS elapsed_seconds INTEGER",
+        "ALTER TABLE assessment_attempts ADD COLUMN IF NOT EXISTS hints_used JSON DEFAULT '[]'",
+    ]
+    with engine.begin() as connection:
+        for statement in statements:
+            connection.execute(text(statement))
+
+
 def seed_data() -> None:
     with Session(engine) as session:
         for student in get_seed_students():
@@ -68,10 +84,10 @@ def seed_data() -> None:
 def main() -> None:
     create_extensions()
     create_tables()
+    ensure_existing_table_columns()
     seed_data()
     print("Base de datos inicializada con tablas y datos seed.")
 
 
 if __name__ == "__main__":
     main()
-

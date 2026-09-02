@@ -752,3 +752,27 @@ front sin respuestas prellenadas
 
 Esto convierte el MVP en el primer eslabón de un gemelo digital longitudinal defendible.
 
+## 18. Avance de Ejecución
+
+### Sprint 1 iniciado
+
+Se implementó la primera base backend para flujo productivo por IDs:
+
+```text
+POST /api/v1/sessions/start
+POST /api/v1/sessions/attempts/core
+```
+
+También se añadieron:
+
+```text
+learning_sessions
+evidence_events
+mastery_estimates
+```
+
+El detalle operativo y el prompt para Lovable están en:
+
+```text
+docs/sprint_1_backend_lovable.md
+```

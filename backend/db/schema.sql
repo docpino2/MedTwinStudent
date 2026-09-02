@@ -45,14 +45,53 @@ CREATE TABLE IF NOT EXISTS clinical_cases (
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS assessment_attempts (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+CREATE TABLE IF NOT EXISTS learning_sessions (
+    id TEXT PRIMARY KEY DEFAULT ('session_' || replace(uuid_generate_v4()::text, '-', '')),
     student_id TEXT NOT NULL REFERENCES students(id),
+    case_version_id TEXT NOT NULL REFERENCES clinical_cases(id),
+    status TEXT NOT NULL DEFAULT 'iniciada',
+    current_phase TEXT NOT NULL DEFAULT 'diagnostico_integral',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS assessment_attempts (
+    id TEXT PRIMARY KEY DEFAULT uuid_generate_v4()::text,
+    student_id TEXT NOT NULL REFERENCES students(id),
+    session_id TEXT REFERENCES learning_sessions(id),
     clinical_case_id TEXT NOT NULL REFERENCES clinical_cases(id),
     student_response TEXT,
+    confidence_before NUMERIC(4, 3),
+    confidence_after NUMERIC(4, 3),
+    elapsed_seconds INTEGER,
+    hints_used JSONB NOT NULL DEFAULT '[]',
     score NUMERIC(5, 2),
     reasoning_analysis JSONB NOT NULL DEFAULT '{}',
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS evidence_events (
+    id TEXT PRIMARY KEY DEFAULT ('evidence_' || replace(uuid_generate_v4()::text, '-', '')),
+    student_id TEXT NOT NULL REFERENCES students(id),
+    session_id TEXT NOT NULL REFERENCES learning_sessions(id),
+    event_type TEXT NOT NULL,
+    payload JSONB NOT NULL DEFAULT '{}',
+    model_version TEXT NOT NULL DEFAULT 'deterministic-core-v1',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS mastery_estimates (
+    id TEXT PRIMARY KEY DEFAULT ('mastery_' || replace(uuid_generate_v4()::text, '-', '')),
+    student_id TEXT NOT NULL REFERENCES students(id),
+    competency_id TEXT NOT NULL,
+    estimated_mastery DOUBLE PRECISION NOT NULL,
+    uncertainty DOUBLE PRECISION NOT NULL,
+    evidence_count INTEGER NOT NULL DEFAULT 0,
+    model_version TEXT NOT NULL DEFAULT 'deterministic-mastery-v1',
+    explanation TEXT NOT NULL DEFAULT '',
+    last_observed_at TIMESTAMPTZ,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (student_id, competency_id)
 );
 
 CREATE TABLE IF NOT EXISTS learning_interventions (
@@ -70,4 +109,6 @@ CREATE INDEX IF NOT EXISTS idx_students_cycle ON students(cycle);
 CREATE INDEX IF NOT EXISTS idx_concepts_domain ON curriculum_concepts(domain);
 CREATE INDEX IF NOT EXISTS idx_cases_domain ON clinical_cases(domain);
 CREATE INDEX IF NOT EXISTS idx_attempts_student_created ON assessment_attempts(student_id, created_at DESC);
-
+CREATE INDEX IF NOT EXISTS idx_sessions_student_created ON learning_sessions(student_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_evidence_session_created ON evidence_events(session_id, created_at);
+CREATE INDEX IF NOT EXISTS idx_mastery_student_competency ON mastery_estimates(student_id, competency_id);
