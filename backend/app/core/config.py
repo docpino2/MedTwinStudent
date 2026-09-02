@@ -4,13 +4,14 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 def normalize_database_url(database_url: str) -> str:
-    if database_url.startswith("postgresql+"):
-        return database_url
-    if database_url.startswith("postgresql://"):
-        return database_url.replace("postgresql://", "postgresql+psycopg://", 1)
-    if database_url.startswith("postgres://"):
-        return database_url.replace("postgres://", "postgresql+psycopg://", 1)
-    return database_url
+    normalized_url = database_url.strip().replace("postgresql +", "postgresql+")
+    if normalized_url.startswith("postgresql+"):
+        return normalized_url
+    if normalized_url.startswith("postgresql://"):
+        return normalized_url.replace("postgresql://", "postgresql+psycopg://", 1)
+    if normalized_url.startswith("postgres://"):
+        return normalized_url.replace("postgres://", "postgresql+psycopg://", 1)
+    return normalized_url
 
 
 class Settings(BaseSettings):
