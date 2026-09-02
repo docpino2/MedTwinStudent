@@ -1,9 +1,10 @@
 from datetime import datetime
 from uuid import uuid4
 
-from sqlalchemy import select
+from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 
+from app.core.database import Base
 from app.models import (
     AssessmentAttempt,
     ClinicalCase,
@@ -20,8 +21,38 @@ from app.schemas.student import StudentProfile
 
 
 class LearningRepository:
+    _runtime_schema_checked = False
+
     def __init__(self, db: Session) -> None:
         self.db = db
+        self._ensure_runtime_schema()
+
+    def _ensure_runtime_schema(self) -> None:
+        if LearningRepository._runtime_schema_checked:
+            return
+
+        bind = self.db.get_bind()
+        Base.metadata.create_all(
+            bind=bind,
+            tables=[
+                LearningSession.__table__,
+                EvidenceEvent.__table__,
+                MasteryEstimate.__table__,
+            ],
+        )
+        if bind.dialect.name == "postgresql":
+            statements = [
+                "ALTER TABLE assessment_attempts ADD COLUMN IF NOT EXISTS session_id TEXT REFERENCES learning_sessions(id)",
+                "ALTER TABLE assessment_attempts ADD COLUMN IF NOT EXISTS confidence_before DOUBLE PRECISION",
+                "ALTER TABLE assessment_attempts ADD COLUMN IF NOT EXISTS confidence_after DOUBLE PRECISION",
+                "ALTER TABLE assessment_attempts ADD COLUMN IF NOT EXISTS elapsed_seconds INTEGER",
+                "ALTER TABLE assessment_attempts ADD COLUMN IF NOT EXISTS hints_used JSON DEFAULT '[]'",
+            ]
+            for statement in statements:
+                self.db.execute(text(statement))
+            self.db.commit()
+
+        LearningRepository._runtime_schema_checked = True
 
     def get_student_profile(self, student_id: str) -> StudentProfile | None:
         student = self.db.get(Student, student_id)
