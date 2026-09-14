@@ -26,6 +26,13 @@ class CognitiveBiasRisk(BaseModel):
     rationale: str
 
 
+class ClinicalEvidenceObservation(BaseModel):
+    criterion: str
+    label: str
+    detected: bool
+    evidence: str | None = None
+
+
 class ReasoningAnalysisResponse(BaseModel):
     reasoning_analysis: str
     likely_knowledge_gaps: list[KnowledgeGap]
@@ -34,4 +41,5 @@ class ReasoningAnalysisResponse(BaseModel):
     next_recommended_activity: str
     tutor_prompt: str
     simulation_update: dict[str, float]
-
+    clinical_evidence: list[ClinicalEvidenceObservation] = Field(default_factory=list)
+    red_flag_coverage: float = 0.0

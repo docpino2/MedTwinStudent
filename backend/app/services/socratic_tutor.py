@@ -8,6 +8,7 @@ from app.schemas.tutor import (
     TutorTurnRequest,
     TutorTurnResponse,
 )
+from app.services.clinical_evidence import ClinicalEvidenceMatcher, normalize_clinical_text
 
 
 CONCEPT_LABELS = {
@@ -24,8 +25,11 @@ CONCEPT_LABELS = {
 class SocraticTutorAgent:
     """Deterministic MVP tutor that asks the next best clinical reasoning question."""
 
+    def __init__(self) -> None:
+        self.evidence_matcher = ClinicalEvidenceMatcher()
+
     def generate_turn(self, request: TutorTurnRequest) -> TutorTurnResponse:
-        response_text = request.latest_student_response.lower()
+        response_text = normalize_clinical_text(request.latest_student_response)
         mastery = {item.concept_id: item.mastery for item in request.student.knowledge_state}
         gaps = self._detect_gaps(request, response_text, mastery)
         biases = self._detect_biases(request, response_text)
@@ -199,7 +203,13 @@ class SocraticTutorAgent:
         gaps: list[TutorKnowledgeGap],
         biases: list[TutorBiasSignal],
     ) -> list[RubricFeedback]:
-        red_flags_named = sum(flag.lower() in response_text for flag in request.clinical_case.red_flags)
+        red_flags_named = sum(
+            match.detected
+            for match in self.evidence_matcher.match_red_flags(
+                request.latest_student_response,
+                request.clinical_case.red_flags,
+            )
+        )
         reasoning_score = 3 if red_flags_named >= 2 and not biases else 2 if red_flags_named else 1
         safety_score = 3 if any(term in response_text for term in ["ecg", "monitor", "serial troponin", "troponina seriada"]) else 1
         metacognition_score = 3 if any(term in response_text for term in ["uncertain", "incierto", "incertidumbre", "rule out", "descartar", "differential", "diferencial"]) else 1

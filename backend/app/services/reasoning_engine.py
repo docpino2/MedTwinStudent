@@ -1,9 +1,11 @@
 from app.schemas.reasoning import (
+    ClinicalEvidenceObservation,
     CognitiveBiasRisk,
     KnowledgeGap,
     ReasoningAnalysisRequest,
     ReasoningAnalysisResponse,
 )
+from app.services.clinical_evidence import ClinicalEvidenceMatcher, normalize_clinical_text
 
 
 CONCEPT_LABELS = {
@@ -18,6 +20,9 @@ CONCEPT_LABELS = {
 
 
 class ReasoningEngine:
+    def __init__(self) -> None:
+        self.evidence_matcher = ClinicalEvidenceMatcher()
+
     def analyze(self, request: ReasoningAnalysisRequest) -> ReasoningAnalysisResponse:
         student = request.student
         clinical_case = request.clinical_case
@@ -38,13 +43,15 @@ class ReasoningEngine:
                     )
                 )
 
-        response_text = (request.student_response or "").lower()
-        missed_red_flags = [
-            flag
-            for flag in clinical_case.red_flags
-            if flag.lower() not in response_text
-        ]
-        bias = self._estimate_bias(student.cycle, response_text, missed_red_flags)
+        response_text = normalize_clinical_text(request.student_response or "")
+        evidence_matches = self.evidence_matcher.match_red_flags(
+            request.student_response or "",
+            clinical_case.red_flags,
+        )
+        missed_red_flags = [match.label for match in evidence_matches if not match.detected]
+        detected_count = sum(match.detected for match in evidence_matches)
+        red_flag_coverage = detected_count / len(evidence_matches) if evidence_matches else 1.0
+        bias = self._estimate_bias(student.cycle, response_text, missed_red_flags, red_flag_coverage)
 
         if gaps:
             top_gap = gaps[0]
@@ -71,6 +78,16 @@ class ReasoningEngine:
             next_recommended_activity=next_activity,
             tutor_prompt=tutor_prompt,
             simulation_update=simulation_update,
+            clinical_evidence=[
+                ClinicalEvidenceObservation(
+                    criterion=match.canonical_flag,
+                    label=match.label,
+                    detected=match.detected,
+                    evidence=match.matched_text,
+                )
+                for match in evidence_matches
+            ],
+            red_flag_coverage=round(red_flag_coverage, 4),
         )
 
     def _estimate_bias(
@@ -78,6 +95,7 @@ class ReasoningEngine:
         cycle: str,
         response_text: str,
         missed_red_flags: list[str],
+        red_flag_coverage: float,
     ) -> CognitiveBiasRisk:
         if "reflux" in response_text or "reflujo" in response_text or "anxiety" in response_text or "ansiedad" in response_text:
             return CognitiveBiasRisk(
@@ -85,7 +103,7 @@ class ReasoningEngine:
                 risk_level="high",
                 rationale="El estudiante parece aceptar un diagnóstico benigno antes de abordar causas cardíacas tiempo-dependientes.",
             )
-        if missed_red_flags:
+        if missed_red_flags and red_flag_coverage < 0.5:
             return CognitiveBiasRisk(
                 bias="anclaje",
                 risk_level="moderate",
@@ -100,7 +118,10 @@ class ReasoningEngine:
         return CognitiveBiasRisk(
             bias="riesgo bajo detectado",
             risk_level="low",
-            rationale="El razonamiento entregado atiende los conceptos requeridos y las banderas rojas a este nivel MVP.",
+            rationale=(
+                "El razonamiento reconoce la mayoría de las banderas rojas y mantiene la prioridad clínica; "
+                "las omisiones restantes requieren retroalimentación sin constituir por sí solas un sesgo relevante."
+            ),
         )
 
     def _build_reasoning_summary(
@@ -114,7 +135,7 @@ class ReasoningEngine:
         cycle_label = student.cycle.replace("_", " ")
         gap_clause = f"se detectan {len(gaps)} brecha(s) probable(s)" if gaps else "no se detectan brechas mayores"
         red_flag_clause = (
-            f"Banderas rojas omitidas: {', '.join(missed_red_flags)}."
+            f"Banderas rojas aún no representadas: {', '.join(missed_red_flags)}."
             if missed_red_flags
             else "Las banderas rojas clave fueron representadas."
         )
