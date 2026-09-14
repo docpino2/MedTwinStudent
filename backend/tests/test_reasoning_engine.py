@@ -59,6 +59,9 @@ def test_reasoning_engine_recognizes_spanish_chest_pain_paraphrases() -> None:
     assert result.red_flag_coverage == 0.75
     assert result.cognitive_bias_risk.risk_level == "low"
     assert "exertional chest pressure" not in result.reasoning_analysis
+    assert "ciencias clínicas" in result.reasoning_analysis
+    assert "Dolor torácico de esfuerzo en el servicio de urgencias" in result.reasoning_analysis
+    assert "Reconociste la mayoría" in result.feedback
 
 
 def test_reasoning_engine_does_not_credit_negated_red_flag() -> None:

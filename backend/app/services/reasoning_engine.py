@@ -18,6 +18,16 @@ CONCEPT_LABELS = {
     "differential_diagnosis_chest_pain": "Diagnóstico diferencial del dolor torácico",
 }
 
+CYCLE_LABELS = {
+    "basic_sciences": "ciencias básicas",
+    "clinical_sciences": "ciencias clínicas",
+    "internship": "internado",
+}
+
+CASE_LABELS = {
+    "case_chest_pain_001": "Dolor torácico de esfuerzo en el servicio de urgencias",
+}
+
 
 class ReasoningEngine:
     def __init__(self) -> None:
@@ -63,7 +73,7 @@ class ReasoningEngine:
             next_activity = "Avanzar a un caso de dolor torácico de mayor complejidad con diagnósticos pulmonares y vasculares competidores."
 
         reasoning_analysis = self._build_reasoning_summary(request, gaps, missed_red_flags)
-        feedback = self._build_feedback(gaps, missed_red_flags)
+        feedback = self._build_feedback(gaps, missed_red_flags, red_flag_coverage)
         tutor_prompt = self._build_tutor_prompt(request, gaps, bias)
         simulation_update = {
             concept_id: max(0.0, min(1.0, mastery_by_concept.get(concept_id, 0.0) + (0.04 if concept_id not in {gap.concept_id for gap in gaps} else -0.02)))
@@ -132,7 +142,8 @@ class ReasoningEngine:
     ) -> str:
         student = request.student
         clinical_case = request.clinical_case
-        cycle_label = student.cycle.replace("_", " ")
+        cycle_label = CYCLE_LABELS.get(student.cycle, student.cycle.replace("_", " "))
+        case_label = CASE_LABELS.get(clinical_case.id, clinical_case.title)
         gap_clause = f"se detectan {len(gaps)} brecha(s) probable(s)" if gaps else "no se detectan brechas mayores"
         red_flag_clause = (
             f"Banderas rojas aún no representadas: {', '.join(missed_red_flags)}."
@@ -141,16 +152,27 @@ class ReasoningEngine:
         )
         return (
             f"{student.name} está en el ciclo {cycle_label} y analiza "
-            f"'{clinical_case.title}'. La traza de razonamiento muestra que {gap_clause}. {red_flag_clause}"
+            f"'{case_label}'. La traza de razonamiento muestra que {gap_clause}. {red_flag_clause}"
         )
 
-    def _build_feedback(self, gaps: list[KnowledgeGap], missed_red_flags: list[str]) -> str:
+    def _build_feedback(
+        self,
+        gaps: list[KnowledgeGap],
+        missed_red_flags: list[str],
+        red_flag_coverage: float,
+    ) -> str:
         if not gaps and not missed_red_flags:
             return "Buen razonamiento inicial. Mantén primero los diagnósticos potencialmente mortales y luego acota con ECG, cinética de troponinas y factores de riesgo."
 
         messages = []
         if missed_red_flags:
-            messages.append("Empieza nombrando las banderas rojas y explicando por qué cambian la urgencia.")
+            if red_flag_coverage >= 0.5:
+                messages.append(
+                    "Reconociste la mayoría de las banderas rojas; incorpora también "
+                    f"{', '.join(missed_red_flags)} y explica cómo modifica la prioridad."
+                )
+            else:
+                messages.append("Empieza nombrando las banderas rojas y explicando por qué cambian la urgencia.")
         if gaps:
             messages.append(f"Revisa {gaps[0].concept_label.lower()} antes de intentar el siguiente caso.")
         return " ".join(messages)
