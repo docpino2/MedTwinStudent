@@ -1,9 +1,35 @@
 from sqlalchemy import text
+from sqlalchemy.dialects.postgresql import insert as postgres_insert
 from sqlalchemy.orm import Session
 
 from app.core.database import Base, engine
 from app.models import AssessmentAttempt, ClinicalCase, CurriculumConcept, Student
 from app.services.seed_repository import get_seed_cases, get_seed_concepts, get_seed_students
+
+
+POSTGRADUATE_STUDENT_ID = "stu_postgraduate_internal_medicine_001"
+
+
+def ensure_postgraduate_profile() -> None:
+    """Add the new demo profile without changing existing longitudinal data."""
+    student = next(item for item in get_seed_students() if item.id == POSTGRADUATE_STUDENT_ID)
+    values = {
+        "id": student.id,
+        "name": student.name,
+        "cycle": student.cycle,
+        "current_rotation": student.current_rotation,
+        "mastery_level": student.mastery_level,
+        "strengths": student.strengths,
+        "vulnerabilities": student.vulnerabilities,
+        "knowledge_state": [item.model_dump(mode="json") for item in student.knowledge_state],
+        "learning_preferences": student.learning_preferences,
+    }
+    with Session(engine) as session:
+        if session.bind.dialect.name == "postgresql":
+            session.execute(postgres_insert(Student).values(**values).on_conflict_do_nothing(index_elements=[Student.id]))
+        elif session.get(Student, student.id) is None:
+            session.add(Student(**values))
+        session.commit()
 
 
 def create_extensions() -> None:

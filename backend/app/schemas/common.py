@@ -5,6 +5,7 @@ class LearningCycle(StrEnum):
     BASIC_SCIENCES = "basic_sciences"
     CLINICAL_SCIENCES = "clinical_sciences"
     INTERNSHIP = "internship"
+    POSTGRADUATE = "postgraduate"
 
 
 class MasteryLevel(StrEnum):
@@ -12,4 +13,3 @@ class MasteryLevel(StrEnum):
     DEVELOPING = "developing"
     COMPETENT = "competent"
     ADVANCED = "advanced"
-

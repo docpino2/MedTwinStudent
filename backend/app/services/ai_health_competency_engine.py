@@ -129,7 +129,7 @@ class AIHealthCompetencyEngine:
             self._score_clinical_reasoning_with_ai(request, prompt, critique),
             self._score_metacognition(request, prompt, critique),
         ]
-        if cycle == LearningCycle.INTERNSHIP:
+        if cycle in {LearningCycle.INTERNSHIP, LearningCycle.POSTGRADUATE}:
             scores.append(self._score_escalation_and_systems(request, prompt, critique))
 
         risks = self._detect_risks(request, prompt, output, critique)
@@ -297,7 +297,7 @@ class AIHealthCompetencyEngine:
         return AIHealthCriterionScore(
             criterion="escalamiento_y_restricciones_del_sistema",
             score=min(score, 4),
-            rationale="Evalúa si el interno usa IA sin perder supervisión, flujo de atención y límites institucionales.",
+            rationale="Evalúa si el estudiante clínico avanzado usa IA sin perder supervisión, flujo de atención y límites institucionales.",
             evidence=evidence,
             next_step="Explicitar cuándo escalar, a quién y qué restricciones del sistema modifican la conducta.",
         )
@@ -337,12 +337,12 @@ class AIHealthCompetencyEngine:
                     mitigation="Exigir verificación contra datos del caso y guías antes de aceptar la salida.",
                 )
             )
-        if request.student.cycle == LearningCycle.INTERNSHIP and not request.escalated_to_human_supervisor:
+        if request.student.cycle in {LearningCycle.INTERNSHIP, LearningCycle.POSTGRADUATE} and not request.escalated_to_human_supervisor:
             risks.append(
                 AIHealthRiskSignal(
                     risk="falta de escalamiento supervisado",
                     level="moderado",
-                    rationale="En internado, el uso de IA en un caso potencialmente riesgoso debe integrarse con supervisión humana.",
+                    rationale="En formación clínica avanzada, el uso de IA en un caso potencialmente riesgoso debe integrarse con supervisión humana.",
                     mitigation="Definir umbral de escalamiento y comunicar incertidumbre al supervisor.",
                 )
             )
@@ -402,7 +402,7 @@ class AIHealthCompetencyEngine:
             return "Rehacer el prompt con checklist de privacidad y seguridad antes de consultar nuevamente el modelo."
         if gaps:
             return "Completar una estación breve de IA clínica segura con crítica obligatoria de la salida generada."
-        if cycle == LearningCycle.INTERNSHIP:
+        if cycle in {LearningCycle.INTERNSHIP, LearningCycle.POSTGRADUATE}:
             return "Avanzar a un flujo con agentes: tutor, evaluador, simulador y debrief docente."
         return "Avanzar a un caso contrastante donde la IA omite una bandera roja y el estudiante debe detectarla."
 
@@ -414,7 +414,15 @@ class AIHealthCompetencyEngine:
     ) -> str:
         return (
             f"{request.student.name} obtiene {overall:.1f}/4 en Competencias IA/Salud Digital "
-            f"para el ciclo {request.student.cycle.replace('_', ' ')}. "
+            f"para el ciclo {self._cycle_label(request.student.cycle)}. "
             f"Persisten {len(gaps)} brecha(s) emergentes que deben integrarse al gemelo digital educativo."
         )
 
+    @staticmethod
+    def _cycle_label(cycle: LearningCycle) -> str:
+        return {
+            LearningCycle.BASIC_SCIENCES: "ciencias básicas",
+            LearningCycle.CLINICAL_SCIENCES: "ciencias clínicas",
+            LearningCycle.INTERNSHIP: "internado",
+            LearningCycle.POSTGRADUATE: "postgrado en Medicina Interna",
+        }[cycle]

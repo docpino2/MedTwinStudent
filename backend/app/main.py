@@ -14,6 +14,9 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         from app.db_init import main as initialize_database
 
         initialize_database()
+    from app.db_init import ensure_postgraduate_profile
+
+    ensure_postgraduate_profile()
     yield
 
 

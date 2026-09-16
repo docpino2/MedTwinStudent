@@ -103,7 +103,7 @@ class SocraticTutorAgent:
                     debiasing_move="Pedirle que identifique primero el diagnóstico peligroso que no puede omitir.",
                 )
             )
-        if "first" not in response_text and request.student.cycle == LearningCycle.INTERNSHIP:
+        if "first" not in response_text and request.student.cycle in {LearningCycle.INTERNSHIP, LearningCycle.POSTGRADUATE}:
             biases.append(
                 TutorBiasSignal(
                     bias="poor_prioritization",
@@ -141,7 +141,7 @@ class SocraticTutorAgent:
     ) -> TutorIntent:
         if cycle == LearningCycle.BASIC_SCIENCES:
             return TutorIntent.PROBE_MECHANISM
-        if cycle == LearningCycle.INTERNSHIP:
+        if cycle in {LearningCycle.INTERNSHIP, LearningCycle.POSTGRADUATE}:
             if any(gap.concept_id == "initial_acs_management" for gap in gaps):
                 return TutorIntent.PROBE_MANAGEMENT
             return TutorIntent.PROBE_SAFETY
@@ -171,6 +171,11 @@ class SocraticTutorAgent:
                 "Construye una representación del problema en una frase; luego nombra tus tres "
                 "diagnósticos principales y el dato que más cambiaría tu priorización."
             )
+        if request.student.cycle == LearningCycle.POSTGRADUATE:
+            return (
+                "¿Cómo priorizarías las causas tiempo-dependientes, qué dato cambiaría tu plan "
+                "y cómo comunicarías la incertidumbre y el escalamiento al equipo?"
+            )
         if intent == TutorIntent.PROBE_MANAGEMENT:
             return (
                 "En los primeros cinco minutos, ¿qué harías para mantener seguro a este paciente "
@@ -193,6 +198,7 @@ class SocraticTutorAgent:
             LearningCycle.BASIC_SCIENCES: "El estudiante necesita fortalecer mecanismos causales antes de etiquetar diagnósticos.",
             LearningCycle.CLINICAL_SCIENCES: "El estudiante necesita organizar los datos en diagnóstico diferencial y rasgos discriminantes.",
             LearningCycle.INTERNSHIP: "El estudiante necesita priorizar seguridad, escalamiento y acción bajo incertidumbre.",
+            LearningCycle.POSTGRADUATE: "El residente necesita integrar diagnóstico, seguridad, coordinación del equipo y decisiones bajo incertidumbre.",
         }
         return f"{rationales[cycle]} Intención pedagógica actual: {intent.value}."
 
@@ -259,7 +265,7 @@ class SocraticTutorAgent:
                     inputs={"biases": [bias.bias for bias in biases]},
                 )
             )
-        if request.student.cycle == LearningCycle.INTERNSHIP:
+        if request.student.cycle in {LearningCycle.INTERNSHIP, LearningCycle.POSTGRADUATE}:
             tools.append(
                 TutorToolCall(
                     tool_name="generate_branching_simulation_step",

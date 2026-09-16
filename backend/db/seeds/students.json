@@ -104,6 +104,66 @@
       }
     ],
     "learning_preferences": ["simulation", "rapid feedback"]
+  },
+  {
+    "id": "stu_postgraduate_internal_medicine_001",
+    "name": "Carlos Pérez",
+    "cycle": "postgraduate",
+    "current_rotation": "Medicina Interna",
+    "mastery_level": "advanced",
+    "strengths": [
+      "integración clínica de problemas complejos",
+      "diagnóstico diferencial",
+      "coordinación del equipo asistencial"
+    ],
+    "vulnerabilities": [
+      "calibración de incertidumbre ante pruebas iniciales negativas",
+      "verificación crítica de recomendaciones generadas por IA"
+    ],
+    "knowledge_state": [
+      {
+        "concept_id": "chest_pain_red_flags",
+        "concept_label": "Banderas rojas en dolor torácico",
+        "mastery": 0.88,
+        "confidence": 0.82,
+        "last_assessed_at": "2026-09-16"
+      },
+      {
+        "concept_id": "ecg_initial_interpretation",
+        "concept_label": "Interpretación inicial del ECG",
+        "mastery": 0.82,
+        "confidence": 0.79,
+        "last_assessed_at": "2026-09-16"
+      },
+      {
+        "concept_id": "acs_risk_stratification",
+        "concept_label": "Estratificación de riesgo de síndrome coronario agudo",
+        "mastery": 0.84,
+        "confidence": 0.76,
+        "last_assessed_at": "2026-09-16"
+      },
+      {
+        "concept_id": "troponin_kinetics",
+        "concept_label": "Cinética de troponinas",
+        "mastery": 0.73,
+        "confidence": 0.68,
+        "last_assessed_at": "2026-09-16"
+      },
+      {
+        "concept_id": "initial_acs_management",
+        "concept_label": "Manejo inicial del síndrome coronario agudo",
+        "mastery": 0.86,
+        "confidence": 0.8,
+        "last_assessed_at": "2026-09-16"
+      },
+      {
+        "concept_id": "differential_diagnosis_chest_pain",
+        "concept_label": "Diagnóstico diferencial del dolor torácico",
+        "mastery": 0.85,
+        "confidence": 0.81,
+        "last_assessed_at": "2026-09-16"
+      }
+    ],
+    "learning_preferences": ["casos contrastantes", "simulación de decisiones", "debrief docente"]
   }
 ]
-

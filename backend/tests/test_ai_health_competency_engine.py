@@ -66,6 +66,22 @@ def test_ai_health_evaluation_detects_privacy_and_overreliance_risk() -> None:
     assert "checklist" in result.next_recommended_activity.lower()
 
 
+def test_postgraduate_ai_health_evaluation_includes_supervision() -> None:
+    student = next(item for item in get_seed_students() if item.id == "stu_postgraduate_internal_medicine_001")
+    request = AIHealthEvaluationRequest(
+        student=student,
+        intent=AIUseIntent.MANAGEMENT_PLANNING,
+        student_ai_prompt="Compara diagnóstico diferencial y riesgos del dolor torácico sin identificadores.",
+        student_critique="Verificaría la salida de IA con ECG y discutiría la incertidumbre con el equipo.",
+        escalated_to_human_supervisor=True,
+    )
+
+    result = AIHealthCompetencyEngine().evaluate(request)
+
+    assert any(score.criterion == "escalamiento_y_restricciones_del_sistema" for score in result.competency_scores)
+    assert "postgrado en Medicina Interna" in result.digital_health_trajectory_note
+
+
 def test_ai_health_endpoint_returns_spanish_outputs() -> None:
     client = TestClient(app)
     student = next(item for item in get_seed_students() if item.id == "stu_basic_001")
@@ -93,4 +109,3 @@ def test_ai_health_endpoint_returns_spanish_outputs() -> None:
     body = response.json()
     assert "Fortalece" in body["feedback"] or "Uso sólido" in body["feedback"]
     assert "Competencias IA/Salud Digital" in body["digital_health_trajectory_note"]
-

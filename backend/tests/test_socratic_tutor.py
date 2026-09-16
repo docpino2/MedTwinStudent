@@ -1,5 +1,24 @@
 from app.schemas.tutor import TutorTurnRequest
 from app.services.seed_repository import get_seed_cases, get_seed_students
+
+
+def test_postgraduate_tutor_prioritizes_team_and_uncertainty() -> None:
+    student = next(item for item in get_seed_students() if item.id == "stu_postgraduate_internal_medicine_001")
+    payload = {
+        "student": student.model_dump(mode="json"),
+        "clinical_case": get_seed_cases()[0].model_dump(mode="json"),
+        "conversation": [],
+        "latest_student_response": "Priorizo síndrome coronario agudo y solicito ECG.",
+    }
+    from fastapi.testclient import TestClient
+    from app.main import app
+
+    response = TestClient(app).post("/api/v1/tutor/turn", json=payload)
+    assert response.status_code == 200
+    body = response.json()
+    assert body["teaching_style"] == "postgraduate"
+    assert "equipo" in body["tutor_question"]
+    assert "El residente" in body["rationale_for_question"]
 from app.services.socratic_tutor import SocraticTutorAgent
 
 

@@ -22,6 +22,7 @@ CYCLE_LABELS = {
     "basic_sciences": "ciencias básicas",
     "clinical_sciences": "ciencias clínicas",
     "internship": "internado",
+    "postgraduate": "postgrado en Medicina Interna",
 }
 
 CASE_LABELS = {
