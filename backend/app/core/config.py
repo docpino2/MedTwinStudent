@@ -1,5 +1,6 @@
 from functools import cached_property
 
+from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -24,6 +25,8 @@ class Settings(BaseSettings):
     openai_base_url: str = "https://api.openai.com/v1"
     openai_model: str = "gpt-4.1-mini"
     init_db_on_startup: bool = False
+    pilot_accounts_json: SecretStr = SecretStr("[]")
+    auth_session_hours: int = Field(default=8, ge=1, le=24)
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 

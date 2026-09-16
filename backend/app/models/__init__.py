@@ -3,6 +3,7 @@ from app.models.case import ClinicalCase
 from app.models.curriculum import CurriculumConcept
 from app.models.learning import EvidenceEvent, LearningSession, MasteryEstimate
 from app.models.student import Student
+from app.models.auth import AuthSession, AuthUser
 
 __all__ = [
     "AssessmentAttempt",
@@ -12,4 +13,6 @@ __all__ = [
     "LearningSession",
     "MasteryEstimate",
     "Student",
+    "AuthSession",
+    "AuthUser",
 ]

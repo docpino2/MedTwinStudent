@@ -1,8 +1,9 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from app.core.auth import get_current_user
 
 from app.api.v1 import ai_health, cases, curriculum, reasoning, sessions, simulation, students, tutor
 
-api_router = APIRouter()
+api_router = APIRouter(dependencies=[Depends(get_current_user)])
 api_router.include_router(students.router, prefix="/students", tags=["students"])
 api_router.include_router(sessions.router, prefix="/sessions", tags=["sesiones longitudinales"])
 api_router.include_router(curriculum.router, prefix="/curriculum", tags=["curriculum"])

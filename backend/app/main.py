@@ -2,9 +2,12 @@ from contextlib import asynccontextmanager
 from collections.abc import AsyncIterator
 
 from fastapi import FastAPI
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1.router import api_router
+from app.api.v1.auth import router as auth_router
 from app.core.config import settings
 
 
@@ -17,6 +20,10 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     from app.db_init import ensure_postgraduate_profile
 
     ensure_postgraduate_profile()
+    from app.core.database import engine
+    from app.services.auth_service import initialize_auth
+
+    initialize_auth(engine)
     yield
 
 
@@ -38,6 +45,12 @@ def create_app() -> FastAPI:
     )
 
     app.include_router(api_router, prefix="/api/v1")
+    app.include_router(auth_router, prefix="/api/v1/auth", tags=["acceso"])
+
+    @app.exception_handler(RequestValidationError)
+    async def validation_error(request, exc: RequestValidationError):
+        # Validation responses must not reflect passwords or other submitted evidence.
+        return JSONResponse(status_code=422, content={"detail": "Revisa los campos enviados.", "fields": [list(error["loc"]) for error in exc.errors()]})
 
     @app.get("/health", tags=["health"])
     def health_check() -> dict[str, str]:
